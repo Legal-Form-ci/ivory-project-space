@@ -44,6 +44,7 @@ const SubscriptionGuide = lazy(() => import("./pages/SubscriptionGuide"));
 const IncubationProgram = lazy(() => import("./pages/IncubationProgram"));
 const Ebook = lazy(() => import("./pages/Ebook"));
 const Forum = lazy(() => import("./pages/Forum"));
+const DocumentDownload = lazy(() => import("./pages/DocumentDownload"));
 
 const queryClient = new QueryClient();
 
