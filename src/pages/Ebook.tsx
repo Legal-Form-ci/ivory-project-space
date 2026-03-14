@@ -142,10 +142,15 @@ const Ebook = () => {
                         <CheckCircle className="h-6 w-6" />
                         <span className="font-semibold">Guide débloqué !</span>
                       </div>
-                      <Button size="lg" onClick={() => window.open("/documents/50-opportunites-investissement.pdf", "_blank")}>
+                      <Button size="lg" onClick={() => window.open(pdfUrl, "_blank")}>
                         <Download className="h-5 w-5 mr-2" />
                         Télécharger à nouveau
                       </Button>
+                      <div>
+                        <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary underline">
+                          Cliquer ici pour télécharger votre document
+                        </a>
+                      </div>
                     </div>
                   ) : (
                     <Button size="lg" onClick={() => setShowForm(true)} className="gap-2">
