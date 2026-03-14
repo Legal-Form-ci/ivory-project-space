@@ -1,0 +1,623 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+const SYSTEM_PROMPT = `Tu es Miprojet, l'assistant virtuel intelligent de la plateforme MIPROJET - Plateforme Panafricaine de Structuration et d'Orientation de Projets.
+
+À PROPOS DE MIPROJET:
+- MIPROJET accompagne les porteurs de projets dans la structuration professionnelle de leurs idées selon les normes ISO 21500
+- La plateforme analyse, rédige des business plans, évalue les risques et attribue un label de qualité
+- MIPROJET oriente ensuite les projets validés vers des partenaires adaptés (investisseurs, banques, bailleurs de fonds)
+- IMPORTANT: MIPROJET n'est PAS un organisme de financement direct
+
+SERVICES PROPOSÉS:
+1. Structuration de projets selon norme ISO 21500
+2. Rédaction de business plans professionnels
+3. Analyse de faisabilité et évaluation des risques
+4. Labellisation et validation des projets (scores A, B, C)
+5. Orientation vers des partenaires financiers adaptés
+6. Accompagnement et coaching entrepreneurial
+7. Formation en gestion de projets
+8. Création d'entreprise
+
+CONTACT:
+- Site: ivoireprojet.com
+- Email: infos@ivoireprojet.com
+- Téléphone: +225 07 16 79 21
+- Adresse: Bingerville – Adjin Palmeraie, 25 BP 2454 Abidjan 25, Côte d'Ivoire
+
+RÈGLES:
+- Réponds toujours en français de manière claire et professionnelle
+- Sois concis mais complet
+- Rappelle que MIPROJET ne finance pas directement mais oriente vers des partenaires`;
+
+const AI_CONTENT_SYSTEM = `Tu es un rédacteur professionnel expert pour MIPROJET, plateforme panafricaine.
+
+CAPACITÉ CLÉ: Tu peux générer du contenu complet et professionnel à partir d'un SEUL mot, d'une émotion, ou d'une idée brève.
+
+EXEMPLES D'ENTRÉES MINIMALES:
+- "partenariat" → Article complet sur un nouveau partenariat stratégique
+- "formation" → Article sur un programme de formation MIPROJET
+- "succès" → Témoignage de réussite d'un porteur de projet
+- "Bonne nouvelle" → Annonce positive structurée
+- "agriculture" → Article sur les opportunités dans l'agriculture
+
+RÈGLES CRITIQUES:
+1. NE JAMAIS utiliser de balises HTML, Markdown, symboles techniques
+2. Le texte doit sembler 100% écrit par un humain professionnel
+3. TITRE en MAJUSCULES (max 80 caractères, percutant)
+4. Utiliser des emojis pertinents pour les sous-titres: 🚀 📌 💡 🎯 ✅ 📊 💰 🌍
+5. Paragraphes courts, aérés, faciles à lire sur mobile
+6. Phrases fluides, naturelles, jamais robotiques
+7. Hashtags en fin de contenu: #MIPROJET #Entrepreneuriat #Afrique + hashtags contextuels
+8. Contact MIPROJET en fin: infos@ivoireprojet.com | +225 07 16 79 21
+
+STRUCTURE DU CONTENU:
+🚀 TITRE ACCROCHEUR
+
+Phrase d'introduction percutante qui donne envie de lire.
+
+📌 SECTION 1
+Contenu développé, informatif, engageant.
+
+🎯 SECTION 2
+Détails, arguments, données.
+
+✅ CONCLUSION OU APPEL À L'ACTION
+Synthèse et invitation.
+
+📧 CONTACT
+MIPROJET | infos@ivoireprojet.com | +225 07 16 79 21
+
+#MIPROJET #Entrepreneuriat #Afrique`;
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const body = await req.json();
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    
+    if (!LOVABLE_API_KEY) {
+      throw new Error("LOVABLE_API_KEY is not configured");
+    }
+
+    const action = body.action;
+
+    // ===== AI IMAGE GENERATION =====
+    if (action === 'generate_image') {
+      const topic = body.topic || body.content || "professional business";
+      
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash-image",
+          messages: [
+            {
+              role: "user",
+              content: `Generate a professional, ultra-realistic, high-resolution image for a social media publication about: ${topic}. The image should be clean, modern, professional, suitable for a business platform. No watermarks, no text overlay, no logos. Corporate African business aesthetic.`
+            }
+          ],
+          modalities: ["image", "text"]
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("Image generation failed:", response.status);
+        return new Response(JSON.stringify({ error: "Image generation failed" }), {
+          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" }
+        });
+      }
+
+      const aiData = await response.json();
+      const imageUrl = aiData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+      
+      if (imageUrl) {
+        // Upload to Supabase storage
+        const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+        const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+        const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        // Convert base64 to blob
+        const base64Data = imageUrl.replace(/^data:image\/\w+;base64,/, "");
+        const binaryString = atob(base64Data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+
+        const fileName = `ai-generated/${Date.now()}_ai_image.png`;
+        const { error: uploadError } = await supabase.storage
+          .from('news-media')
+          .upload(fileName, bytes, { contentType: 'image/png', upsert: true });
+
+        if (uploadError) {
+          console.error("Upload error:", uploadError);
+          // Return base64 directly as fallback
+          return new Response(JSON.stringify({ image_url: imageUrl }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
+
+        const { data: urlData } = supabase.storage.from('news-media').getPublicUrl(fileName);
+        return new Response(JSON.stringify({ image_url: urlData.publicUrl }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        });
+      }
+
+      return new Response(JSON.stringify({ error: "No image generated" }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
+    }
+    
+    // ===== OPPORTUNITY GENERATION =====
+    if (action === 'generate_opportunity') {
+      const content = body.content || "";
+      const opportunityType = body.opportunity_type || "funding";
+      
+      const typeLabels: Record<string, string> = {
+        funding: "Financement", training: "Formation", accompaniment: "Accompagnement",
+        partnership: "Partenariat", grant: "Subvention", other: "Autre"
+      };
+      
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: [
+            { 
+              role: "system", 
+              content: `Tu es un expert en veille d'opportunités pour MIPROJET, plateforme panafricaine.
+
+CAPACITÉ CLÉ: Tu peux générer une fiche d'opportunité complète même à partir d'un SEUL MOT.
+
+TYPE D'OPPORTUNITÉ: ${typeLabels[opportunityType] || opportunityType}
+
+${AI_CONTENT_SYSTEM}
+
+Réponds UNIQUEMENT en JSON valide:
+{
+  "title": "TITRE EN MAJUSCULES (max 80 car)",
+  "description": "Phrase d'accroche courte et percutante",
+  "content": "Contenu structuré complet avec emojis et sections",
+  "category": "funding|training|grants|partnerships|general",
+  "eligibility": "Critères d'éligibilité résumés",
+  "location": "Zone géographique",
+  "external_link": "",
+  "contact_email": "infos@ivoireprojet.com",
+  "contact_phone": "+225 07 16 79 21"
+}`
+            },
+            { role: "user", content: `Génère une fiche d'opportunité professionnelle complète à partir de : ${content}` }
+          ],
+          max_tokens: 3000,
+        }),
+      });
+
+      if (!response.ok) throw new Error("AI generation failed");
+
+      const aiData = await response.json();
+      const aiContent = aiData.choices?.[0]?.message?.content || "";
+      
+      try {
+        const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (parsed.content) {
+            parsed.content = parsed.content.replace(/<[^>]*>/g, '').replace(/#{1,6}\s*/g, '').replace(/\*\*/g, '').replace(/\*/g, '');
+          }
+          return new Response(JSON.stringify(parsed), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
+      } catch (e) { console.error("Parse error:", e); }
+      
+      return new Response(JSON.stringify({
+        title: content.toUpperCase().substring(0, 80),
+        description: `Opportunité de ${typeLabels[opportunityType]} - ${content}`,
+        content: `🚀 ${content.toUpperCase()}\n\nOpportunité de ${typeLabels[opportunityType]} disponible.\n\n📧 CONTACT MIPROJET\n- Email : infos@ivoireprojet.com\n- Tél : +225 07 16 79 21\n\n#MIPROJET #Opportunité`,
+        category: "general",
+        eligibility: "Porteurs de projets en Afrique",
+        location: "Afrique de l'Ouest",
+        contact_email: "infos@ivoireprojet.com",
+        contact_phone: "+225 07 16 79 21"
+      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // ===== NEWS GENERATION =====
+    if (action === 'generate_news') {
+      const content = body.content || "";
+      
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: [
+            { 
+              role: "system", 
+              content: `${AI_CONTENT_SYSTEM}
+
+CATÉGORIES: general, events, projects, partnerships, training, opportunities, funding
+
+Réponds UNIQUEMENT en JSON valide:
+{
+  "title": "TITRE ACCROCHEUR EN MAJUSCULES (max 80 caractères)",
+  "excerpt": "Résumé court et percutant (150-200 caractères)",
+  "content": "Contenu formaté professionnel avec emojis et sections",
+  "category": "catégorie détectée"
+}`
+            },
+            { role: "user", content: `Transforme en article professionnel complet:\n\n${content}` }
+          ],
+          max_tokens: 2500,
+        }),
+      });
+
+      if (!response.ok) throw new Error("AI generation failed");
+
+      const aiData = await response.json();
+      const aiContent = aiData.choices?.[0]?.message?.content || "";
+      
+      try {
+        const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (parsed.content) {
+            parsed.content = parsed.content.replace(/<[^>]*>/g, '').replace(/#{1,6}\s*/g, '').replace(/\*\*/g, '').replace(/\*/g, '');
+          }
+          return new Response(JSON.stringify(parsed), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
+      } catch (e) { console.error("Parse error:", e); }
+      
+      return new Response(JSON.stringify({
+        title: content.split('\n')[0]?.substring(0, 80) || "Actualité MIPROJET",
+        excerpt: content.substring(0, 200) + "...",
+        content: content,
+        category: "general"
+      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // ===== EVALUATION GENERATION =====
+    if (action === 'generate_evaluation') {
+      const projectData = body.projectData || {};
+      const scores = body.scores || {};
+      
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: [
+            { 
+              role: "system", 
+              content: `Tu es un expert en évaluation de projets pour MIPROJET. Génère une évaluation professionnelle.
+
+Réponds UNIQUEMENT en JSON valide:
+{
+  "resume": "Résumé exécutif (2-3 phrases)",
+  "forces": ["Point fort 1", "Point fort 2", "Point fort 3"],
+  "faiblesses": ["Point à améliorer 1", "Point à améliorer 2"],
+  "recommandations": ["Recommandation 1", "Recommandation 2", "Recommandation 3"]
+}`
+            },
+            { 
+              role: "user", 
+              content: `Évalue ce projet:\nProjet: ${projectData.title || "Non spécifié"}\nSecteur: ${projectData.sector || "Non spécifié"}\nDescription: ${projectData.description || "Non fournie"}\n\nScores:\n- Porteur: ${scores.porteur || 0}/100\n- Projet: ${scores.projet || 0}/100\n- Financier: ${scores.financier || 0}/100\n- Maturité: ${scores.maturite || 0}/100\n- Impact: ${scores.impact || 0}/100\n- Équipe: ${scores.equipe || 0}/100`
+            }
+          ],
+          max_tokens: 1000,
+        }),
+      });
+
+      if (!response.ok) throw new Error("AI evaluation failed");
+
+      const aiData = await response.json();
+      const aiContent = aiData.choices?.[0]?.message?.content || "";
+      
+      try {
+        const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          return new Response(JSON.stringify(JSON.parse(jsonMatch[0])), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
+      } catch (e) { console.error("Evaluation parse error:", e); }
+      
+      return new Response(JSON.stringify({
+        resume: "Projet en cours d'évaluation.",
+        forces: ["Idée innovante", "Secteur porteur", "Engagement du porteur"],
+        faiblesses: ["Documentation à compléter", "Projections à affiner"],
+        recommandations: ["Finaliser le business plan", "Identifier des partenaires"]
+      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // ===== UNIVERSAL CONTENT GENERATION =====
+    if (action === 'generate_universal_content') {
+      const content = body.content || "";
+      const contentType = body.content_type || "article";
+      
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: [
+            { 
+              role: "system", 
+              content: `${AI_CONTENT_SYSTEM}
+
+TYPE DE CONTENU DEMANDÉ: ${contentType}
+
+Catégories: general, events, projects, partnerships, training, opportunities, funding
+
+Réponds UNIQUEMENT en JSON valide:
+{ "title": "TITRE MAJUSCULES", "excerpt": "Résumé court", "content": "Contenu structuré", "category": "catégorie" }`
+            },
+            { role: "user", content: `Génère un contenu professionnel complet à partir de:\n${content}` }
+          ],
+          max_tokens: 2500,
+        }),
+      });
+
+      if (!response.ok) throw new Error("AI universal generation failed");
+
+      const aiData = await response.json();
+      const aiContent = aiData.choices?.[0]?.message?.content || "";
+      
+      try {
+        const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (parsed.content) {
+            parsed.content = parsed.content.replace(/<[^>]*>/g, '').replace(/#{1,6}\s*/g, '').replace(/\*\*/g, '').replace(/\*/g, '');
+          }
+          return new Response(JSON.stringify(parsed), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
+      } catch (e) { console.error("Universal content parse error:", e); }
+      
+      return new Response(JSON.stringify({
+        title: content.split('\n')[0]?.substring(0, 80) || "Contenu MIPROJET",
+        excerpt: content.substring(0, 200) + "...",
+        content: content,
+        category: "general"
+      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // ===== WHATSAPP NOTIFICATION =====
+    if (action === 'send_whatsapp') {
+      const { phone, message, notification_type } = body;
+      
+      // Log the notification attempt
+      const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const supabase = createClient(supabaseUrl, supabaseKey);
+
+      // Generate personalized message with AI
+      const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash-lite",
+          messages: [
+            { 
+              role: "system", 
+              content: `Tu génères des messages WhatsApp professionnels pour MIPROJET.
+Le message doit commencer par: "📢 [MIPROJET - Message automatique]"
+Suivi de: "⚠️ Ceci est un message automatique, merci de ne pas répondre."
+Puis le contenu personnalisé.
+Le message doit être court (max 500 caractères), professionnel et engageant.
+Terminer par: "MIPROJET | ivoireprojet.com | +225 07 16 79 21"`
+            },
+            { role: "user", content: `Type: ${notification_type}\nContenu: ${message}` }
+          ],
+          max_tokens: 300,
+        }),
+      });
+
+      let finalMessage = message;
+      if (aiResponse.ok) {
+        const aiData = await aiResponse.json();
+        finalMessage = aiData.choices?.[0]?.message?.content || message;
+      }
+
+      // Log to notifications table
+      if (body.user_id) {
+        await supabase.from('notifications').insert({
+          user_id: body.user_id,
+          title: `WhatsApp: ${notification_type}`,
+          message: finalMessage,
+          type: 'info',
+          metadata: { channel: 'whatsapp', phone, notification_type }
+        });
+      }
+
+      // WhatsApp Business API call (if configured)
+      const WHATSAPP_TOKEN = Deno.env.get("WHATSAPP_BUSINESS_TOKEN");
+      const WHATSAPP_PHONE_ID = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID");
+      
+      if (WHATSAPP_TOKEN && WHATSAPP_PHONE_ID) {
+        try {
+          const waResponse = await fetch(
+            `https://graph.facebook.com/v18.0/${WHATSAPP_PHONE_ID}/messages`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${WHATSAPP_TOKEN}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                messaging_product: "whatsapp",
+                to: phone.replace(/[^0-9]/g, ''),
+                type: "text",
+                text: { body: finalMessage }
+              }),
+            }
+          );
+          
+          const waData = await waResponse.json();
+          return new Response(JSON.stringify({ success: true, whatsapp_sent: true, data: waData }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        } catch (waError) {
+          console.error("WhatsApp API error:", waError);
+        }
+      }
+
+      // Return success even without WhatsApp API (notification logged)
+      return new Response(JSON.stringify({ 
+        success: true, 
+        whatsapp_sent: false, 
+        message: "Notification enregistrée. WhatsApp Business API non configurée.",
+        generated_message: finalMessage
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
+    }
+
+    // ===== EMAIL GENERATION =====
+    if (action === 'generate_email') {
+      const { template_type, variables } = body;
+      
+      const templates: Record<string, string> = {
+        welcome: `Génère un email de bienvenue pour un nouvel inscrit sur MIPROJET. Nom: ${variables?.name || 'Membre'}. Email professionnel, chaleureux.`,
+        payment_success: `Génère un email de confirmation de paiement. Plan: ${variables?.plan || 'Premium'}. Montant: ${variables?.amount || '30 000'} FCFA. Email formel avec récapitulatif.`,
+        new_opportunity: `Génère un email d'alerte pour une nouvelle opportunité. Titre: ${variables?.title || 'Opportunité'}. Description: ${variables?.description || ''}. Email engageant avec CTA.`,
+        password_reset: `Génère un email de réinitialisation de mot de passe pour MIPROJET. Court, sécurisé, professionnel.`,
+        subscription_expiry: `Génère un email d'alerte expiration d'abonnement. Plan: ${variables?.plan || 'Standard'}. Date: ${variables?.date || 'bientôt'}. Incitatif au renouvellement.`,
+      };
+      
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            { 
+              role: "system", 
+              content: `Tu es le rédacteur d'emails pour MIPROJET.
+Génère des emails HTML professionnels avec:
+- Logo MIPROJET en haut
+- Design sobre, couleur primaire #1a365d
+- Bouton CTA vert #38a169
+- Footer: MIPROJET | infos@ivoireprojet.com | +225 07 16 79 21 | ivoireprojet.com
+- Responsive
+Réponds en JSON: { "subject": "Objet de l'email", "html": "Contenu HTML complet" }`
+            },
+            { role: "user", content: templates[template_type] || `Génère un email professionnel: ${template_type}` }
+          ],
+          max_tokens: 2000,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Email generation failed");
+
+      const aiData = await response.json();
+      const aiContent = aiData.choices?.[0]?.message?.content || "";
+      
+      try {
+        const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          return new Response(JSON.stringify(JSON.parse(jsonMatch[0])), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
+      } catch (e) { console.error("Email parse error:", e); }
+      
+      return new Response(JSON.stringify({ subject: "MIPROJET", html: "<p>Email MIPROJET</p>" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
+    }
+
+    // ===== DEFAULT: CHAT ASSISTANT =====
+    const messages = body.messages || [];
+    if (!Array.isArray(messages)) {
+      return new Response(
+        JSON.stringify({ error: "Format de messages invalide" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          ...messages,
+        ],
+        stream: true,
+        max_tokens: 1024,
+      }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Limite de requêtes atteinte, réessayez plus tard." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "Crédits insuffisants." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      const errorText = await response.text();
+      console.error("AI gateway error:", response.status, errorText);
+      return new Response(
+        JSON.stringify({ error: "Erreur du service IA" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    return new Response(response.body, {
+      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+    });
+  } catch (error) {
+    console.error("Assistant error:", error);
+    return new Response(
+      JSON.stringify({ error: error instanceof Error ? error.message : "Erreur inconnue" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+});

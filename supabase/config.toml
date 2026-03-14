@@ -1,0 +1,56 @@
+project_id = "nrrgqnruoylwztddkntm"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://localhost"
+
+[auth]
+enabled = true
+site_url = "https://ivoireprojet.com"
+additional_redirect_urls = ["https://ivoireprojet.com/login", "https://ivoireprojet.com/dashboard", "https://ivoireprojet.com/auth/callback", "https://www.ivoireprojet.com"]
+
+[functions.wave-payment]
+verify_jwt = false
+
+[functions.wave-webhook]
+verify_jwt = false
+
+[functions.wave-payout]
+verify_jwt = false
+
+[functions.create-admin]
+verify_jwt = false
+
+[functions.miprojet-assistant]
+verify_jwt = false
+
+[functions.send-invoice-email]
+verify_jwt = false
+
+[functions.fedapay-payment]
+verify_jwt = false
+
+[functions.fedapay-webhook]
+verify_jwt = false
+
+[functions.money-fusion-payment]
+verify_jwt = false
+
+[functions.money-fusion-webhook]
+verify_jwt = false
+
+[functions.kkiapay-webhook]
+verify_jwt = false
