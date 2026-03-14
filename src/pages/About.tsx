@@ -65,9 +65,10 @@ const stats = [
 
 const team = [
   {
-    name: "Inocent KOFFI",
-    role: "Directeur Général",
-    description: "Expert en structuration de projets avec plus de 15 ans d'expérience"
+    name: "Dr Konan Marcel KOUASSI",
+    role: "Fondateur & CEO",
+    description: "Fondateur et CEO de MIPROJET. Expert en structuration de projets avec une vision panafricaine.",
+    photo: founderPhoto,
   },
   {
     name: "Aminata DIALLO",
