@@ -212,6 +212,10 @@ const AdminDashboard = () => {
             <TabsContent value="leads" className="space-y-6">
               <AdminLeadsManager />
             </TabsContent>
+
+            <TabsContent value="documents" className="space-y-6">
+              <AdminDocumentsManager />
+            </TabsContent>
             
             <TabsContent value="subscriptions" className="space-y-6">
               <AdminSubscriptionsManager />

@@ -161,6 +161,11 @@ const App = () => (
                 <Forum />
               </Suspense>
             } />
+            <Route path="/documents/:id" element={
+              <Suspense fallback={<PageLoader />}>
+                <DocumentDownload />
+              </Suspense>
+            } />
             
             {/* Payment */}
             <Route path="/payment/callback" element={
