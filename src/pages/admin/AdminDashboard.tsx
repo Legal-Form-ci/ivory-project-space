@@ -34,6 +34,7 @@ import { AdminOpportunitiesManager } from "@/components/admin/AdminOpportunities
 import { AdminSubscriptionsManager } from "@/components/admin/AdminSubscriptionsManager";
 import { EmailTemplateManager } from "@/components/admin/EmailTemplateManager";
 import { AdminLeadsManager } from "@/components/admin/AdminLeadsManager";
+import { AdminDocumentsManager } from "@/components/admin/AdminDocumentsManager";
 
 const AdminDashboard = () => {
   const { user, isAdmin, loading, adminChecked, signOut } = useAuth();
@@ -210,6 +211,10 @@ const AdminDashboard = () => {
 
             <TabsContent value="leads" className="space-y-6">
               <AdminLeadsManager />
+            </TabsContent>
+
+            <TabsContent value="documents" className="space-y-6">
+              <AdminDocumentsManager />
             </TabsContent>
             
             <TabsContent value="subscriptions" className="space-y-6">
