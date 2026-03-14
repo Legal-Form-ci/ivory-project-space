@@ -255,14 +255,18 @@ const About = () => {
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {team.map((member, index) => (
+              {team.map((member: any, index: number) => (
                 <Card key={index} className="text-center hover:shadow-elegant transition-shadow">
                   <CardContent className="p-6">
-                    <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary-glow rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-2xl font-bold text-primary-foreground">
-                        {member.name.split(' ').map(n => n[0]).join('')}
-                      </span>
-                    </div>
+                    {member.photo ? (
+                      <img src={member.photo} alt={member.name} className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-2 border-primary/30" />
+                    ) : (
+                      <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary-glow rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span className="text-2xl font-bold text-primary-foreground">
+                          {member.name.split(' ').map((n: string) => n[0]).join('')}
+                        </span>
+                      </div>
+                    )}
                     <h3 className="text-lg font-semibold mb-1">{member.name}</h3>
                     <p className="text-primary font-medium text-sm mb-2">{member.role}</p>
                     <p className="text-muted-foreground text-sm">{member.description}</p>
