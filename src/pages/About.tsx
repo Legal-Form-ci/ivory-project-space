@@ -8,6 +8,7 @@ import {
   Building2, Handshake, MapPin
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import founderPhoto from "@/assets/dr-marcel-konan.png";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
