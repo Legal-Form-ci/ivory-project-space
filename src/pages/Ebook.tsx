@@ -67,11 +67,6 @@ const Ebook = () => {
     fetchDocumentRecord();
   }, []);
 
-  const setMetaTag = (property: string, content: string) => {
-    let meta = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement | null;
-    if (!meta) { meta = document.createElement("meta"); meta.setAttribute("property", property); document.head.appendChild(meta); }
-    meta.content = content;
-  };
 
   const fetchDocumentRecord = async () => {
     // Try to find the document in platform_documents
