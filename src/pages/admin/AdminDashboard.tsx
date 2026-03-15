@@ -35,6 +35,7 @@ import { AdminSubscriptionsManager } from "@/components/admin/AdminSubscriptions
 import { EmailTemplateManager } from "@/components/admin/EmailTemplateManager";
 import { AdminLeadsManager } from "@/components/admin/AdminLeadsManager";
 import { AdminDocumentsManager } from "@/components/admin/AdminDocumentsManager";
+import { AdminFirecrawlScraper } from "@/components/admin/AdminFirecrawlScraper";
 
 const AdminDashboard = () => {
   const { user, isAdmin, loading, adminChecked, signOut } = useAuth();
