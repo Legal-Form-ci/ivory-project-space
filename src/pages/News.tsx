@@ -55,6 +55,9 @@ const News = () => {
     { value: "projects", label: t('news.categoryProjects') || "Projets" },
     { value: "partnerships", label: t('news.categoryPartnerships') || "Partenariats" },
     { value: "training", label: t('news.categoryTraining') || "Formations" },
+    { value: "expansion", label: "Expansion" },
+    { value: "financement", label: "Financement" },
+    { value: "formation", label: "Formation" },
   ];
 
   const defaultImages = [
