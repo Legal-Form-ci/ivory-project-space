@@ -174,7 +174,7 @@ const News = () => {
           
           <div className="container mx-auto px-4 text-center relative z-10">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              {t('news.pageTitle')}
+              Actualités & Blog
             </h1>
             <p className="text-lg md:text-xl text-primary-foreground/90 max-w-2xl mx-auto">
               {t('news.pageSubtitle')}

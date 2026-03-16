@@ -107,8 +107,7 @@ export const Navigation = () => {
                   <NavigationMenuContent>
                     <ul className="grid w-[280px] gap-1 p-2">
                       <li><NavigationMenuLink asChild><Link to="/documents" className="block p-2 rounded-md hover:bg-muted text-sm">📚 Documents & Guides</Link></NavigationMenuLink></li>
-                      <li><NavigationMenuLink asChild><Link to="/news" className="block p-2 rounded-md hover:bg-muted text-sm">📰 Actualités</Link></NavigationMenuLink></li>
-                      <li><NavigationMenuLink asChild><Link to="/blog" className="block p-2 rounded-md hover:bg-muted text-sm">📝 Blog</Link></NavigationMenuLink></li>
+                      <li><NavigationMenuLink asChild><Link to="/news" className="block p-2 rounded-md hover:bg-muted text-sm">📰 Actualités & Blog</Link></NavigationMenuLink></li>
                       <li><NavigationMenuLink asChild><Link to="/forum" className="block p-2 rounded-md hover:bg-muted text-sm">💬 Forum</Link></NavigationMenuLink></li>
                       <li><NavigationMenuLink asChild><Link to="/success-stories" className="block p-2 rounded-md hover:bg-muted text-sm">🏆 Témoignages</Link></NavigationMenuLink></li>
                       <li><NavigationMenuLink asChild><Link to="/faq" className="block p-2 rounded-md hover:bg-muted text-sm">❓ FAQ</Link></NavigationMenuLink></li>
@@ -250,8 +249,7 @@ export const Navigation = () => {
             {openMobileSub === 'resources' && (
               <div className="pl-4 space-y-1 border-l-2 border-primary/20 ml-2">
                 <Link to="/documents" className="block py-1.5 px-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setIsMenuOpen(false)}>📚 Documents</Link>
-                <Link to="/news" className="block py-1.5 px-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setIsMenuOpen(false)}>📰 Actualités</Link>
-                <Link to="/blog" className="block py-1.5 px-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setIsMenuOpen(false)}>📝 Blog</Link>
+                <Link to="/news" className="block py-1.5 px-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setIsMenuOpen(false)}>📰 Actualités & Blog</Link>
                 <Link to="/forum" className="block py-1.5 px-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setIsMenuOpen(false)}>💬 Forum</Link>
                 <Link to="/success-stories" className="block py-1.5 px-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setIsMenuOpen(false)}>🏆 Témoignages</Link>
                 <Link to="/faq" className="block py-1.5 px-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setIsMenuOpen(false)}>❓ FAQ</Link>
