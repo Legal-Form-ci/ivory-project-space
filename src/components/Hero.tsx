@@ -36,11 +36,11 @@ export const Hero = () => {
   ];
 
   return (
-    <section className="relative min-h-screen flex items-center pt-20 pb-12 overflow-hidden bg-primary">
+    <section className="relative min-h-[90vh] lg:min-h-screen flex items-center pt-20 pb-12 overflow-hidden bg-primary">
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center">
           {/* Left Content */}
-          <div className="space-y-6 sm:space-y-8 text-primary-foreground text-center lg:text-left">
+          <div className="space-y-5 sm:space-y-8 text-primary-foreground text-center lg:text-left">
             {/* News Ticker */}
             {latestNews.length > 0 && (
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
@@ -83,7 +83,7 @@ export const Hero = () => {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 sm:gap-8 py-6 border-t border-b border-white/20">
+            <div className="grid grid-cols-3 gap-3 sm:gap-8 py-4 sm:py-6 border-t border-b border-white/20">
               <div className="text-center lg:text-left">
                 <div className="flex items-center gap-2 justify-center lg:justify-start mb-1">
                   <TrendingUp className="h-5 w-5 text-accent" />
@@ -128,7 +128,7 @@ export const Hero = () => {
           </div>
 
           {/* Right Image */}
-          <div className="relative hidden lg:block">
+          <div className="relative hidden lg:flex justify-center">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
               <img
                 src={heroImage}

@@ -55,6 +55,9 @@ const News = () => {
     { value: "projects", label: t('news.categoryProjects') || "Projets" },
     { value: "partnerships", label: t('news.categoryPartnerships') || "Partenariats" },
     { value: "training", label: t('news.categoryTraining') || "Formations" },
+    { value: "expansion", label: "Expansion" },
+    { value: "financement", label: "Financement" },
+    { value: "formation", label: "Formation" },
   ];
 
   const defaultImages = [
@@ -387,6 +390,9 @@ const News = () => {
           title={selectedNews.title}
           description={selectedNews.excerpt || selectedNews.content.substring(0, 150)}
           imageUrl={selectedNews.image_url || undefined}
+          shareType="news"
+          shareId={selectedNews.id}
+          cta="Lire l'article complet sur MIPROJET"
         />
       )}
 
