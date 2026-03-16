@@ -337,6 +337,9 @@ const OpportunityDetail = () => {
           title={opportunity.title}
           description={opportunity.description || opportunity.content.substring(0, 150)}
           imageUrl={opportunity.image_url || undefined}
+          shareType="opportunity"
+          shareId={opportunity.id}
+          cta="Découvrir cette opportunité sur MIPROJET"
         />
       )}
     </div>
