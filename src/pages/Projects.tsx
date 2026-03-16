@@ -261,6 +261,7 @@ const Projects = () => {
                 {filteredProjects.map((project) => (
                   <ProjectCard
                     key={project.id}
+                    id={project.id}
                     title={project.title}
                     description={project.description || ""}
                     category={project.category || "Autre"}
@@ -270,6 +271,7 @@ const Projects = () => {
                     score={(project.risk_score as "A" | "B" | "C" | "D") || "B"}
                     image={project.image_url || `https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=600&h=400&fit=crop`}
                   />
+                ))}
                 ))}
               </div>
             )}
