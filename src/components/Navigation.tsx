@@ -249,8 +249,7 @@ export const Navigation = () => {
             {openMobileSub === 'resources' && (
               <div className="pl-4 space-y-1 border-l-2 border-primary/20 ml-2">
                 <Link to="/documents" className="block py-1.5 px-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setIsMenuOpen(false)}>📚 Documents</Link>
-                <Link to="/news" className="block py-1.5 px-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setIsMenuOpen(false)}>📰 Actualités</Link>
-                <Link to="/blog" className="block py-1.5 px-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setIsMenuOpen(false)}>📝 Blog</Link>
+                <Link to="/news" className="block py-1.5 px-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setIsMenuOpen(false)}>📰 Actualités & Blog</Link>
                 <Link to="/forum" className="block py-1.5 px-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setIsMenuOpen(false)}>💬 Forum</Link>
                 <Link to="/success-stories" className="block py-1.5 px-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setIsMenuOpen(false)}>🏆 Témoignages</Link>
                 <Link to="/faq" className="block py-1.5 px-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setIsMenuOpen(false)}>❓ FAQ</Link>
