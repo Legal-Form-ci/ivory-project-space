@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, ExternalLink } from "lucide-react";
+import { Copy, ExternalLink, Bug } from "lucide-react";
 
 interface SocialSharePopupProps {
   open: boolean;
@@ -19,10 +19,12 @@ const SITE_URL = "https://miprojet.agricapital.ci";
 const SUPABASE_FUNCTIONS_BASE = "https://nrrgqnruoylwztddkntm.supabase.co/functions/v1";
 
 function getShareUrl(props: SocialSharePopupProps): string {
-  // Use a public edge endpoint that always returns OG-ready HTML for social crawlers
+  const origin = typeof window !== "undefined" ? window.location.origin : SITE_URL;
+
   if (props.shareType && props.shareId) {
-    return `${SUPABASE_FUNCTIONS_BASE}/og-image?type=${encodeURIComponent(props.shareType)}&id=${encodeURIComponent(props.shareId)}`;
+    return `${SUPABASE_FUNCTIONS_BASE}/og-image?type=${encodeURIComponent(props.shareType)}&id=${encodeURIComponent(props.shareId)}&origin=${encodeURIComponent(origin)}&target=${encodeURIComponent(props.url || origin)}`;
   }
+
   return props.url || SITE_URL;
 }
 
@@ -73,6 +75,11 @@ export const SocialSharePopup = (props: SocialSharePopupProps) => {
     toast({ title: "Copié !", description: "Le texte de partage a été copié dans le presse-papiers." });
   };
 
+  const copyDebugLink = () => {
+    navigator.clipboard.writeText(shareUrl);
+    toast({ title: "Lien debug copié", description: "Le lien OG a été copié pour vérifier les meta tags." });
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-sm">
@@ -95,11 +102,21 @@ export const SocialSharePopup = (props: SocialSharePopupProps) => {
             </Button>
           ))}
 
-          <div className="border-t pt-3">
+          <div className="border-t pt-3 space-y-2">
             <Button variant="secondary" className="w-full gap-2" onClick={copyLink}>
               <Copy className="h-4 w-4" />
               Copier le texte de partage
             </Button>
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="outline" className="gap-2" onClick={copyDebugLink}>
+                <Bug className="h-4 w-4" />
+                Copier lien de debug OG
+              </Button>
+              <Button variant="outline" className="gap-2" onClick={() => window.open(shareUrl, "_blank") }>
+                <ExternalLink className="h-4 w-4" />
+                Ouvrir debug OG
+              </Button>
+            </div>
           </div>
         </div>
       </DialogContent>
