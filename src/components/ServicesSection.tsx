@@ -64,7 +64,7 @@ export const ServicesSection = () => {
   return (
     <section className="py-24 bg-muted/30">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
+        <div className="text-left md:text-center mb-16">
           <span className="inline-block px-4 py-2 bg-primary/10 rounded-full text-primary font-semibold text-sm mb-4">
             {t('services.badge')}
           </span>

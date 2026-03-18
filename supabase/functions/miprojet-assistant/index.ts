@@ -354,8 +354,8 @@ Réponds UNIQUEMENT en JSON valide:
       }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // ===== UNIVERSAL CONTENT GENERATION =====
-    if (action === 'generate_universal_content') {
+    // ===== ARTICLE HTML GENERATION (WYSIWYG) =====
+    if (action === 'generate_article_html' || action === 'generate_universal_content') {
       const content = body.content || "";
       const contentType = body.content_type || "article";
       
@@ -370,22 +370,44 @@ Réponds UNIQUEMENT en JSON valide:
           messages: [
             { 
               role: "system", 
-              content: `${AI_CONTENT_SYSTEM}
+              content: `Tu es un rédacteur professionnel pour MIPROJET, plateforme panafricaine de structuration de projets.
 
-TYPE DE CONTENU DEMANDÉ: ${contentType}
+CAPACITÉ CLÉ: À partir d'un SEUL MOT ou d'une phrase, tu génères un article complet, structuré et professionnel.
+
+RÈGLES DE RÉDACTION:
+- Ton journalistique, factuel, sobre et respectueux
+- Jamais détectable comme généré par IA
+- Pas de superlatifs excessifs ni de formules creuses
+- Contenu immédiatement publiable
+
+FORMAT DE SORTIE: JSON valide avec du HTML propre pour le champ content.
+
+Le HTML doit utiliser: <h2>, <h3>, <p>, <strong>, <em>, <ul><li>, <ol><li>, <blockquote>, <table>, <hr>.
+- Titres h2 pour les sections principales
+- Paragraphes bien aérés
+- Tableaux comparatifs si le sujet le justifie (avec <thead> stylé)
+- Listes à puces pour les points clés
+- Citations pour les éléments importants
+- PAS de balises <h1> (réservé au titre)
+- PAS de classes CSS ni de styles inline
 
 Catégories: general, events, projects, partnerships, training, opportunities, funding
 
 Réponds UNIQUEMENT en JSON valide:
-{ "title": "TITRE MAJUSCULES", "excerpt": "Résumé court", "content": "Contenu structuré", "category": "catégorie" }`
+{
+  "title": "TITRE EN MAJUSCULES (max 80 car, percutant)",
+  "excerpt": "Phrase d'accroche courte et engageante (max 200 car)",
+  "content": "<h2>Section 1</h2><p>Contenu...</p>...",
+  "category": "catégorie détectée"
+}`
             },
-            { role: "user", content: `Génère un contenu professionnel complet à partir de:\n${content}` }
+            { role: "user", content: `Génère un article professionnel complet à partir de:\n${content}` }
           ],
-          max_tokens: 2500,
+          max_tokens: 3000,
         }),
       });
 
-      if (!response.ok) throw new Error("AI universal generation failed");
+      if (!response.ok) throw new Error("AI generation failed");
 
       const aiData = await response.json();
       const aiContent = aiData.choices?.[0]?.message?.content || "";
@@ -394,19 +416,16 @@ Réponds UNIQUEMENT en JSON valide:
         const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           const parsed = JSON.parse(jsonMatch[0]);
-          if (parsed.content) {
-            parsed.content = parsed.content.replace(/<[^>]*>/g, '').replace(/#{1,6}\s*/g, '').replace(/\*\*/g, '').replace(/\*/g, '');
-          }
           return new Response(JSON.stringify(parsed), {
             headers: { ...corsHeaders, "Content-Type": "application/json" }
           });
         }
-      } catch (e) { console.error("Universal content parse error:", e); }
+      } catch (e) { console.error("Parse error:", e); }
       
       return new Response(JSON.stringify({
-        title: content.split('\n')[0]?.substring(0, 80) || "Contenu MIPROJET",
+        title: content.split('\n')[0]?.substring(0, 80).toUpperCase() || "CONTENU MIPROJET",
         excerpt: content.substring(0, 200) + "...",
-        content: content,
+        content: `<h2>${content}</h2><p>Contenu en cours de rédaction.</p>`,
         category: "general"
       }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }

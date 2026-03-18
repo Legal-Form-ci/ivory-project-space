@@ -154,10 +154,10 @@ export const LatestNews = () => {
                 
                 {/* Content */}
                 <div className="p-5">
-                  <h3 className="font-bold text-lg text-foreground line-clamp-2 mb-3 group-hover:text-primary transition-colors">
+                  <h3 className="font-bold text-lg text-foreground line-clamp-2 mb-3 group-hover:text-primary transition-colors text-left">
                     {item.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+                  <p className="text-sm text-muted-foreground line-clamp-3 mb-4 text-left">
                     {excerpt}
                   </p>
                   
