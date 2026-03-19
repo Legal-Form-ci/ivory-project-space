@@ -108,7 +108,7 @@ export const Hero = () => {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Link to="/submit-project" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
                   {t('hero.submitProject')}

@@ -43,7 +43,7 @@ const StatCard = ({ stat, index, isVisible, t }: { stat: StatItem; index: number
         <stat.icon className={`h-7 w-7 ${stat.color}`} />
       </div>
       <div className="space-y-1">
-        <p className={`text-4xl font-bold ${stat.color}`}>
+        <p className={`text-2xl sm:text-4xl font-bold ${stat.color}`}>
           {count}{stat.suffix}
         </p>
         <p className="text-muted-foreground font-medium">{t(stat.labelKey)}</p>
