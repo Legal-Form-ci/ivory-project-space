@@ -68,7 +68,7 @@ export const Hero = () => {
               </h2>
             </div>
             
-            <p className="text-base sm:text-lg text-white/90 leading-relaxed max-w-xl mx-auto lg:mx-0">
+            <p className="text-sm sm:text-base lg:text-lg text-white/90 leading-relaxed max-w-xl">
               {t('hero.description')}
             </p>
 
