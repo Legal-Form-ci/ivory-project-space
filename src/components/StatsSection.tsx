@@ -36,14 +36,14 @@ const StatCard = ({ stat, index, isVisible, t }: { stat: StatItem; index: number
   
   return (
     <div 
-      className="text-center p-6 rounded-2xl bg-card border border-border/50 hover:shadow-elegant transition-all duration-300 hover:-translate-y-1"
+      className="text-center p-4 sm:p-6 rounded-2xl bg-card border border-border/50 hover:shadow-elegant transition-all duration-300 hover:-translate-y-1"
       style={{ animationDelay: `${index * 100}ms` }}
     >
       <div className={`inline-flex items-center justify-center w-14 h-14 rounded-xl bg-muted mb-4`}>
         <stat.icon className={`h-7 w-7 ${stat.color}`} />
       </div>
       <div className="space-y-1">
-        <p className={`text-4xl font-bold ${stat.color}`}>
+        <p className={`text-2xl sm:text-4xl font-bold ${stat.color}`}>
           {count}{stat.suffix}
         </p>
         <p className="text-muted-foreground font-medium">{t(stat.labelKey)}</p>
@@ -95,7 +95,7 @@ export const StatsSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 max-w-5xl mx-auto">
           {stats.map((stat, index) => (
             <StatCard key={stat.labelKey} stat={stat} index={index} isVisible={isVisible} t={t} />
           ))}

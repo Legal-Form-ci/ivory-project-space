@@ -39,16 +39,16 @@ export const RecommendedDocuments = () => {
   return (
     <section className="py-16 bg-muted/30">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-primary/10 rounded-xl">
-              <FileText className="h-7 w-7 text-primary" />
+            <div className="p-3 bg-primary/10 rounded-xl flex-shrink-0">
+              <FileText className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
             </div>
             <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
                 Documents recommandés
               </h2>
-              <p className="text-muted-foreground">Les ressources les plus téléchargées</p>
+              <p className="text-sm sm:text-base text-muted-foreground">Les ressources les plus téléchargées</p>
             </div>
           </div>
           <Link to="/documents">

@@ -36,11 +36,11 @@ export const Hero = () => {
   ];
 
   return (
-    <section className="relative min-h-[90vh] lg:min-h-screen flex items-center pt-20 pb-12 overflow-hidden bg-primary">
+    <section className="relative min-h-[85vh] sm:min-h-[90vh] lg:min-h-screen flex items-center pt-16 sm:pt-20 pb-8 sm:pb-12 overflow-hidden bg-primary">
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center">
           {/* Left Content */}
-          <div className="space-y-5 sm:space-y-8 text-primary-foreground text-center lg:text-left">
+          <div className="space-y-4 sm:space-y-6 lg:space-y-8 text-primary-foreground text-left">
             {/* News Ticker */}
             {latestNews.length > 0 && (
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
@@ -68,14 +68,14 @@ export const Hero = () => {
               </h2>
             </div>
             
-            <p className="text-base sm:text-lg text-white/90 leading-relaxed max-w-xl mx-auto lg:mx-0">
+            <p className="text-sm sm:text-base lg:text-lg text-white/90 leading-relaxed max-w-xl">
               {t('hero.description')}
             </p>
 
             {/* Highlights */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto lg:mx-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 max-w-xl">
               {highlights.map((item, index) => (
-                <div key={index} className="flex items-center gap-2 text-white/90 justify-center lg:justify-start">
+                <div key={index} className="flex items-center gap-2 text-white/90">
                   <CheckCircle className="h-5 w-5 text-accent flex-shrink-0" />
                   <span className="text-sm sm:text-base">{item}</span>
                 </div>
@@ -84,23 +84,23 @@ export const Hero = () => {
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-3 sm:gap-8 py-4 sm:py-6 border-t border-b border-white/20">
-              <div className="text-center lg:text-left">
-                <div className="flex items-center gap-2 justify-center lg:justify-start mb-1">
+              <div className="text-left">
+                <div className="flex items-center gap-1 sm:gap-2 mb-1">
                   <TrendingUp className="h-5 w-5 text-accent" />
                   <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">105+</span>
                 </div>
                 <p className="text-xs sm:text-sm text-white/80">{t('hero.projectsStructured')}</p>
               </div>
-              <div className="text-center lg:text-left">
-                <div className="flex items-center gap-2 justify-center lg:justify-start mb-1">
-                  <Users className="h-5 w-5 text-accent" />
+              <div className="text-left">
+                <div className="flex items-center gap-1 sm:gap-2 mb-1">
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 text-accent" />
                   <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">65+</span>
                 </div>
                 <p className="text-xs sm:text-sm text-white/80">{t('hero.activeMembers')}</p>
               </div>
-              <div className="text-center lg:text-left">
-                <div className="flex items-center gap-2 justify-center lg:justify-start mb-1">
-                  <Shield className="h-5 w-5 text-accent" />
+              <div className="text-left">
+                <div className="flex items-center gap-1 sm:gap-2 mb-1">
+                  <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-accent" />
                   <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">5</span>
                 </div>
                 <p className="text-xs sm:text-sm text-white/80">{t('hero.countriesCovered')}</p>
@@ -108,7 +108,7 @@ export const Hero = () => {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Link to="/submit-project" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
                   {t('hero.submitProject')}
