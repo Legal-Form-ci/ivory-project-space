@@ -36,7 +36,7 @@ export const Hero = () => {
   ];
 
   return (
-    <section className="relative min-h-[90vh] lg:min-h-screen flex items-center pt-20 pb-12 overflow-hidden bg-primary">
+    <section className="relative min-h-[85vh] sm:min-h-[90vh] lg:min-h-screen flex items-center pt-16 sm:pt-20 pb-8 sm:pb-12 overflow-hidden bg-primary">
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center">
           {/* Left Content */}
